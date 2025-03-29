@@ -2,11 +2,18 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { QrCode } from "lucide-react";
 export default function Home() {
+    const token = localStorage.getItem("token");
     return (
         <div className="min-h-screen">
             <div className="flex md:max-w-6xl w-full justify-between p-4 mx-auto">
                 <h2 className="text-2xl text-center font-bold">ScanForChange</h2>
                 <div className="flex gap-3">
+                    {token ?  <Link
+                        to="/dashboard"
+                        className="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-colors"
+                    >
+                        Dashboard
+                    </Link> : <>
                     <Link
                         to="/login"
                         state={{
@@ -24,7 +31,7 @@ export default function Home() {
                         className="inline-flex items-center px-6 py-2 border-1 border-green-600 text-green-600 rounded-md font-semibold hover:bg-green-50 transition-colors"
                     >
                         Register
-                    </Link>
+                    </Link></>}
                 </div>
             </div>
             <div className="relative overflow-hidden py-16 sm:py-24">

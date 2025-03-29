@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Mail, Lock } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = ({ defaultTab = 'login' }) => {
     const location = useLocation();
     const [activeTab, setActiveTab] = useState(defaultTab);
-    
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     useEffect(() => {
         if (location.state?.activeTab) {
             setActiveTab(location.state.activeTab);
@@ -15,7 +17,6 @@ const Login = ({ defaultTab = 'login' }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        name: '',
         confirmPassword: ''
     });
 
@@ -26,12 +27,34 @@ const Login = ({ defaultTab = 'login' }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+        setLoading(true);
         e.preventDefault();
-        if (activeTab === 'login') {
-            console.log('Login:', { email: formData.email, password: formData.password });
-        } else {
-            console.log('Register:', formData);
+        try {
+            if (activeTab === "login") {
+                const { data } = await axios.post("https://buzzard-popular-obviously.ngrok-free.app/api/auth/login", {
+                    email: formData.email,
+                    password: formData.password
+                });
+                localStorage.setItem("token", data.token);
+                alert("Login Successful");
+                setLoading(false);
+                navigate("/dashboard");
+            } else {
+                if (formData.password !== formData.confirmPassword) {
+                    return alert("Passwords do not match!");
+                }
+                await axios.post("https://buzzard-popular-obviously.ngrok-free.app/api/auth/signup", {
+                    email: formData.email,
+                    password: formData.password
+                });
+                alert("Registration Successful");
+                setLoading(false);
+                setActiveTab("login");
+            }
+        } catch (error) {
+            setLoading(false);
+            alert(error.response?.data?.message || "Something went wrong!");
         }
     };
 
@@ -141,8 +164,7 @@ const Login = ({ defaultTab = 'login' }) => {
                                 type="submit"
                                 className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
                             >
-                                {activeTab === 'login' ? 'Sign In' : 'Create Account'}
-                                <ArrowRight className="h-5 w-5" />
+                                {loading ? 'Loading...' : activeTab === 'login' ? 'Sign In' : 'Create Account'}
                             </button>
                         </form>
                     </div>
