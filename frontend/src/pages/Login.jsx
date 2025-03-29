@@ -1,69 +1,155 @@
-import React, { useState } from 'react';
-import { Key, Mail } from 'lucide-react';
-import image from "./imageForLogin.jpg"
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import React, { useEffect, useState } from 'react';
+import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Logging in with', email, password);
-  };
+const Login = ({ defaultTab = 'login' }) => {
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(defaultTab);
+    
+    useEffect(() => {
+        if (location.state?.activeTab) {
+            setActiveTab(location.state.activeTab);
+        }
+    }, [location.state]);
 
-  return (
-<div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-green-400 to-white">
-    <div>
-    <div className="flex flex-col items-center  p-4 rounded-lg">
-      <h1 className="text-3xl font-bold">
-        <span>ScanForChange</span>
-      </h1>
-      <p className="text-gray-600">Recycle Smart, Earn Rewards</p>
-    </div>
-  <div className="w-full max-w-3xl shadow-lg rounded-2xl bg-white p-10 flex flex-col md:flex-row items-center">
-    <img src={image} className="w-1/2 max-w-xs md:max-w-sm" alt="login image" />
-    <div className="flex-1 w-full md:w-1/2">
-      <h2 className="text-green-600 text-2xl font-bold text-center mb-4">Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block font-medium">Email</label>
-          <div className="flex items-center border rounded p-2">
-            <Mail className="mr-2 text-gray-500" />
-            <input
-              id="email"
-              type="email"
-              placeholder="Email..."
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full h-[20px] outline-none"
-            />
-          </div>
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        name: '',
+        confirmPassword: ''
+    });
+
+    const handleInputChange = (e) => {
+        setFormData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (activeTab === 'login') {
+            console.log('Login:', { email: formData.email, password: formData.password });
+        } else {
+            console.log('Register:', formData);
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-green-50 p-4">
+            <div className="w-full max-w-md">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <div className="px-8 pt-8">
+                        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
+                            Welcome to ScanForChange
+                        </h1>
+                        <p className="text-center text-gray-600 mb-6">
+                            Join our community of eco-warriors
+                        </p>
+
+                        <div className="flex mb-8 justify-center gap-5">
+                            <button
+                                className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'login' ? "border-green-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+                                onClick={() => setActiveTab('login')}>
+                                Sign In
+                            </button>
+                            <button
+                                className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'register' ? "border-green-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+                                onClick={() => setActiveTab('register')}>
+                                Create Account
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="p-8 pt-0">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email Address
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Mail className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        placeholder="you@example.com"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Lock className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            {activeTab === 'register' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Confirm Password
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Lock className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="password"
+                                            name="confirmPassword"
+                                            value={formData.confirmPassword}
+                                            onChange={handleInputChange}
+                                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'login' && (
+                                <div className="flex items-center justify-between text-sm">
+                                    <label className="flex items-center">
+                                        <input type="checkbox" className="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                                        <span className="ml-2 text-gray-600">Remember me</span>
+                                    </label>
+                                    <a href="#" className="text-green-600 hover:text-green-500">
+                                        Forgot password?
+                                    </a>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                            >
+                                {activeTab === 'login' ? 'Sign In' : 'Create Account'}
+                                <ArrowRight className="h-5 w-5" />
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block font-medium">Password</label>
-          <div className="flex items-center border rounded p-2">
-            <Key className="mr-2 text-gray-500" />
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter password..."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full h-[20px] outline-none"
-            />
-          </div>
-        </div>
-        <button type="submit" className="w-full h-[40px] bg-green-600 hover:bg-green-700 text-white p-2 rounded text-lg">
-          Log in
-        </button>
-      </form>
-    </div>
-    </div>
-  </div>
-</div>
-
-  );
+    );
 };
 
 export default Login;
